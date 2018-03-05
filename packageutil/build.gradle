@@ -1,0 +1,102 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion '26.0.2'
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
+    }
+    defaultConfig {
+        applicationId "com.modo.xxx"
+        minSdkVersion 15
+        targetSdkVersion 24
+        versionCode 7
+        versionName "7.0"
+        testInstrumentationRunner "android.support.applayout.runner.AndroidJUnitRunner"
+        //多渠道打包：版本名后面添加一句话，意思就是flavor dimension 它的维度就是该版本号，这样维度就是都是统一的了
+        flavorDimensions "versionCode"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('xxxx.jks')
+            storePassword "xxxx"
+            keyAlias "xxxx"
+            keyPassword "xxx"
+        }
+        release {
+            storeFile file('xx.jks')
+            storePassword "xx"
+            keyAlias "daqxxxing"
+            keyPassword "xxxx"
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            buildConfigField "String", "REYUN_APPKEY", "\"b705f222821066d67c4e30ad94f3a4aa\""
+        }
+        release {
+            buildConfigField "String", "REYUN_APPKEY", "\"e47daf014da0709bb5940eed8d6d4c1b\""
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            //多渠道打包：输出包名
+            // 批量打包(gradle 3.0.0 以下)
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        //输出apk名称为：渠道名_版本名_时间.apk
+//                        def fileName = "${variant.productFlavors[0].name}_v${defaultConfig.versionName}_${releaseTime()}.apk"
+//                        output.outputFile = new File(outputFile.parent, fileName)
+//                    }
+//                }
+//            }
+
+            // 多渠道打包：批量打包(gradle 3.0.0 以上)
+             android.applicationVariants.all { variant ->
+                 variant.outputs.all {
+//                     outputFileName = "zyzy_20171115_1000.apk"
+                     outputFileName = "${variant.productFlavors[0].name}_cjwl_.apk"
+                 }
+             }
+        }
+    }
+    //多渠道打包：打包配置,这边是配置Java类里面的配置
+    productFlavors {
+        ch_301092{
+        buildConfigField  "String", "GAME_URL", "\"http://boboxia.cn/jssdk/index/?channelId=301092&gameKey=ba4db9f126084abc821f61b505cb1433\""
+        }
+        ch_301093{buildConfigField  "String", "GAME_URL", "\"http://boboxia.cn/jssdk/index/?channelId=301093&gameKey=ba4db9f126084abc821f61b505cb1433\"" }
+        ch_301095{buildConfigField  "String", "GAME_URL", "\"http://boboxia.cn/jssdk/index/?channelId=301095&gameKey=ba4db9f126084abc821f61b505cb1433\"" }
+        ch_301096{buildConfigField  "String", "GAME_URL", "\"http://boboxia.cn/jssdk/index/?channelId=301096&gameKey=ba4db9f126084abc821f61b505cb1433\"" }
+    }
+}
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'ren.yale.android:cachewebviewlib:1.2.7'
+    testCompile 'junit:junit:4.12'
+    //OKHTTP和retrofit
+    compile('org.ligboy.retrofit2:converter-fastjson-android:2.2.0') {
+        exclude module: 'fastjson'
+    }
+    //这个是retrofit对fastjson的支持，可用fastjson的方式来解析json数据
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.2.0'
+    /*compile 'zlc.season:rxdownload:1.1.1'*/
+    implementation files('libs/alipaySdk-20170922.jar')
+    implementation project(':core_library')
+}
